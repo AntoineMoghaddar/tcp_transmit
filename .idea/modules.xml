@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/tcp_transmit.iml" filepath="$PROJECT_DIR$/tcp_transmit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tcp_transmit_redo/tcp_transmit_redo.iml" filepath="$PROJECT_DIR$/tcp_transmit_redo/tcp_transmit_redo.iml" />
     </modules>
   </component>
 </project>

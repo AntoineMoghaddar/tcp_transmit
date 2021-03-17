@@ -1,13 +1,13 @@
 package tcphack;
 
-
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class TransportLayer {
-    private NetworkLayer network;
-    private byte[] dst;
-    private int srcPort;
-    private int dstPort;
+    private final NetworkLayer network;
+    private final byte[] dst;
+    private final int srcPort;
+    private final int dstPort;
     private int ackNumber;
     boolean connected;
     private int seqNumber;
@@ -33,12 +33,8 @@ public class TransportLayer {
     }
 
     public void send(String message) {
-        byte[] data = null;
-        try {
-            data = message.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        byte[] data;
+        data = message.getBytes(StandardCharsets.UTF_8);
         TCPPacket packet = new TCPPacket(srcPort, dstPort, seqNumber, 0, TCPPacket.ControlBit.PSH.getValue(), 0xFFFF, data);
         seqNumber += data.length;
         network.send(dst, packet.getPkt());
@@ -63,12 +59,8 @@ public class TransportLayer {
             }
             return "";
         }
-        try {
-            return new String(packet.getData(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return "Error";
+        return new String(packet.getData(), StandardCharsets.UTF_8);
+//        return "Error";
     }
 
     public void sendAck() {
@@ -82,6 +74,7 @@ public class TransportLayer {
         //Lets send a SYN packet to connect.
         byte[] data = new byte[0];
         TCPPacket packet = new TCPPacket(srcPort, dstPort, seqNumber, 0, TCPPacket.ControlBit.SYN.getValue(), 0xFFFF, data);
+        System.out.println("Sending to " + Arrays.toString(dst) + " packet: " + Arrays.toString(packet.getPkt()));
         network.send(dst, packet.getPkt());
     }
 }

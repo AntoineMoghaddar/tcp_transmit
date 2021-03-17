@@ -1,5 +1,11 @@
 package tcphack;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+
 public class NetworkLayer {
     TcpHandler handler;
     byte[] src;
@@ -10,18 +16,31 @@ public class NetworkLayer {
     }
 
     public void send(byte[] dst, byte[] data) {
+        ByteArrayOutputStream outputStram = new ByteArrayOutputStream();
+
         byte[] headers = IPv6.makeHeaders(data.length, src, dst);
-        int[] packet = new int[headers.length + data.length];
-        System.arraycopy(headers, 0, packet, 0, headers.length);
-        System.arraycopy(data, 0, packet, headers.length, data.length);
+
+        try {
+            outputStram.write(headers);
+            outputStram.write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        byte[] packet = outputStram.toByteArray();
+
+        IntBuffer intbuf = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN).asIntBuffer();
+        int[] finpack = new int[intbuf.remaining()];
+
         System.out.println("value of packet 6"
-                + packet[6]);
-        handler.sendData(packet);
+                + finpack[6]);
+        handler.sendData(finpack);
     }
 
     public byte[] recv() {
         int[] data = handler.receiveData(1);
+        System.out.println(data.length);
         if (data.length == 0) {
+            System.out.println("returning nothing");
             return new byte[0];
         }
         byte[] res = new byte[data.length - 40];
